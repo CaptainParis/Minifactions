@@ -114,10 +114,14 @@ public class BlockListeners implements Listener {
 
         // Check for defense block
         if (block.getType() == CraftingManager.getDefenseBlockMaterial()) {
-            // Defense blocks can only be broken by explosives
-            event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "Defense blocks can only be broken by explosives.");
-            return;
+            // Get the defense block from storage
+            DefenseBlock defenseBlock = plugin.getDataStorage().getDefenseBlock(block.getLocation());
+            if (defenseBlock != null) {
+                // Defense blocks can only be broken by explosives
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "Defense blocks can only be broken by explosives.");
+                return;
+            }
         }
 
         // Check if player is in a clan
@@ -135,8 +139,30 @@ public class BlockListeners implements Listener {
 
     @EventHandler
     public void onBlockExplode(BlockExplodeEvent event) {
-        // Handle explosions
-        // This would need to be expanded to handle defense block damage
+        // Get the blocks that will be affected by the explosion
+        for (Block block : event.blockList()) {
+            // Check if it's a defense block
+            if (block.getType() == CraftingManager.getDefenseBlockMaterial()) {
+                // Get the defense block from storage
+                DefenseBlock defenseBlock = plugin.getDataStorage().getDefenseBlock(block.getLocation());
+                if (defenseBlock != null) {
+                    // Defense blocks can only be broken by explosives placed by players
+                    // This is handled by the RaidManager, so cancel the explosion for defense blocks
+                    event.blockList().remove(block);
+                }
+            }
+
+            // Check if it's a core block
+            if (block.getType() == CoreBlockManager.getCoreBlockMaterial()) {
+                // Get the core block from storage
+                CoreBlock coreBlock = plugin.getDataStorage().getCoreBlock(block.getLocation());
+                if (coreBlock != null) {
+                    // Core blocks can only be broken by explosives placed by players
+                    // This is handled by the RaidManager, so cancel the explosion for core blocks
+                    event.blockList().remove(block);
+                }
+            }
+        }
     }
 
     /**
@@ -265,6 +291,9 @@ public class BlockListeners implements Listener {
         // Create defense block
         DefenseBlock defenseBlock = new DefenseBlock(block.getLocation(), clan, tier);
         clan.addDefenseBlock(defenseBlock);
+
+        // Add to storage
+        plugin.getDataStorage().addDefenseBlock(defenseBlock);
 
         player.sendMessage(ChatColor.GREEN + "Defense block (Tier " + tier + ") placed successfully!");
     }

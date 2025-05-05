@@ -7,6 +7,7 @@ import Factions.miniFactions.listeners.PlayerListeners;
 import Factions.miniFactions.managers.ClanManager;
 import Factions.miniFactions.managers.CoreBlockManager;
 import Factions.miniFactions.managers.CraftingManager;
+import Factions.miniFactions.managers.RaidManager;
 import Factions.miniFactions.storage.DataStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,6 +20,7 @@ public final class MiniFactions extends JavaPlugin {
     private ClanManager clanManager;
     private CoreBlockManager coreBlockManager;
     private CraftingManager craftingManager;
+    private RaidManager raidManager;
 
     @Override
     public void onEnable() {
@@ -37,6 +39,7 @@ public final class MiniFactions extends JavaPlugin {
         clanManager = new ClanManager(this);
         coreBlockManager = new CoreBlockManager(this);
         craftingManager = new CraftingManager(this);
+        raidManager = new RaidManager(this);
 
         // Register commands
         ClanCommandManager commandManager = new ClanCommandManager(this);
@@ -65,6 +68,11 @@ public final class MiniFactions extends JavaPlugin {
         // Cleanup resources
         if (coreBlockManager != null) {
             coreBlockManager.cleanup();
+        }
+
+        // Cancel any active explosives
+        if (raidManager != null) {
+            raidManager.cancelAllExplosives();
         }
 
         getLogger().info("MiniFactions has been disabled!");
@@ -116,5 +124,13 @@ public final class MiniFactions extends JavaPlugin {
      */
     public CraftingManager getCraftingManager() {
         return craftingManager;
+    }
+
+    /**
+     * Get the raid manager
+     * @return RaidManager instance
+     */
+    public RaidManager getRaidManager() {
+        return raidManager;
     }
 }

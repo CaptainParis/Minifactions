@@ -4,7 +4,7 @@
 # Core Blocks are no longer craftable - they are given to clan leaders automatically
 # Claim Blocks: E = Emerald, R = Redstone Block, D = Diamond
 # Defense Blocks: O = Obsidian, I = Iron Ingot/Block, C = Crying Obsidian, G = Gold Block, D = Diamond Block
-# Explosives: G = Gunpowder, T = TNT, R = Redstone/Redstone Block, B = Blaze Powder
+# Explosives: G = Gunpowder, B = Button, R = Redstone/Redstone Block, P = Blaze Powder
 
 # Core Block Settings
 core:
@@ -392,67 +392,77 @@ raiding:
     1:
       fuse-time: 5 # seconds
       recipe-pattern:
-        - "GTG"
-        - "TRT"
-        - "GTG"
+        - "GBG"
+        - "BRB"
+        - "GBG"
       recipe-key:
         G: GUNPOWDER
-        T: TNT
+        B: STONE_BUTTON
         R: REDSTONE_BLOCK
     # Tier 2
     2:
       fuse-time: 5 # seconds
       recipe:
-        - "GUNPOWDER:32"
+        - "STONE_BUTTON:4"
+        - "GUNPOWDER:8"
         - "REDSTONE:16"
     # Tier 3
     3:
       fuse-time: 5 # seconds
       recipe:
-        - "GUNPOWDER:64"
+        - "STONE_BUTTON:8"
+        - "GUNPOWDER:16"
         - "REDSTONE:32"
     # Tier 4
     4:
       fuse-time: 4 # seconds
       recipe:
-        - "GUNPOWDER:128"
+        - "STONE_BUTTON:12"
+        - "GUNPOWDER:24"
         - "REDSTONE:64"
     # Tier 5
     5:
       fuse-time: 4 # seconds
       recipe:
-        - "TNT:4"
+        - "STONE_BUTTON:16"
+        - "GUNPOWDER:32"
         - "REDSTONE_BLOCK:1"
     # Tier 6
     6:
       fuse-time: 4 # seconds
       recipe:
-        - "TNT:8"
+        - "STONE_BUTTON:32"
+        - "GUNPOWDER:64"
         - "REDSTONE_BLOCK:2"
     # Tier 7
     7:
       fuse-time: 3 # seconds
       recipe:
-        - "TNT:16"
+        - "STONE_BUTTON:64"
+        - "GUNPOWDER:128"
         - "REDSTONE_BLOCK:4"
     # Tier 8
     8:
       fuse-time: 3 # seconds
       recipe:
-        - "TNT:32"
+        - "STONE_BUTTON:128"
+        - "GUNPOWDER:256"
         - "REDSTONE_BLOCK:8"
     # Tier 9
     9:
       fuse-time: 2 # seconds
       recipe:
-        - "TNT:64"
+        - "STONE_BUTTON:256"
+        - "GUNPOWDER:512"
         - "REDSTONE_BLOCK:16"
     # Tier 10 (Maximum)
     10:
       fuse-time: 2 # seconds
       recipe:
-        - "TNT:128"
+        - "STONE_BUTTON:512"
+        - "GUNPOWDER:1024"
         - "REDSTONE_BLOCK:32"
+        - "BLAZE_POWDER:16"
 
 # Clan Settings
 clan:

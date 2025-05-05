@@ -2,6 +2,7 @@ package Factions.miniFactions.listeners;
 
 import Factions.miniFactions.MiniFactions;
 import Factions.miniFactions.managers.CraftingManager;
+import Factions.miniFactions.managers.RaidManager;
 import Factions.miniFactions.models.Clan;
 import Factions.miniFactions.models.CoreBlock;
 import org.bukkit.ChatColor;
@@ -19,20 +20,20 @@ import org.bukkit.inventory.EquipmentSlot;
 public class PlayerListeners implements Listener {
 
     private final MiniFactions plugin;
-    
+
     public PlayerListeners(MiniFactions plugin) {
         this.plugin = plugin;
     }
-    
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        
+
         // Check if player is in a clan
         Clan clan = plugin.getClanManager().getClanByPlayer(player.getUniqueId());
         if (clan != null) {
             player.sendMessage(ChatColor.GREEN + "Welcome back to clan " + clan.getName() + "!");
-            
+
             // Check if clan has a core block
             if (clan.getCoreBlock() != null) {
                 // Check if upkeep is due
@@ -44,17 +45,17 @@ public class PlayerListeners implements Listener {
             }
         }
     }
-    
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         // Ignore off-hand interactions
         if (event.getHand() == EquipmentSlot.OFF_HAND) {
             return;
         }
-        
+
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
-        
+
         // Check for right-click on blocks
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && block != null) {
             // Handle core block interaction
@@ -66,7 +67,7 @@ public class PlayerListeners implements Listener {
                     return;
                 }
             }
-            
+
             // Handle claim block interaction
             if (block.getType() == CraftingManager.getClaimBlockMaterial()) {
                 // Handle claim block interaction
@@ -74,21 +75,21 @@ public class PlayerListeners implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            
+
             // Handle clan door interaction
             if (block.getType() == Material.IRON_DOOR) {
                 // Check if it's a clan door
                 // This would need to be implemented with a ClanDoor class and manager
                 // For now, just check if within a clan's AOI
                 Clan playerClan = plugin.getClanManager().getClanByPlayer(player.getUniqueId());
-                
+
                 // If player is not in a clan, check if door is within any clan's AOI
                 if (playerClan == null && plugin.getCoreBlockManager().isWithinOtherClanAOI(block.getLocation(), null)) {
                     player.sendMessage(ChatColor.RED + "This door can only be opened by clan members.");
                     event.setCancelled(true);
                     return;
                 }
-                
+
                 // If player is in a clan, check if door is within another clan's AOI
                 if (playerClan != null && plugin.getCoreBlockManager().isWithinOtherClanAOI(block.getLocation(), playerClan)) {
                     player.sendMessage(ChatColor.RED + "This door can only be opened by members of the owning clan.");
@@ -97,52 +98,62 @@ public class PlayerListeners implements Listener {
                 }
             }
         }
-        
+
         // Check for explosive placement
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && block != null && 
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && block != null &&
                 player.getInventory().getItemInMainHand().getType() == CraftingManager.getExplosiveMaterial() &&
                 player.getInventory().getItemInMainHand().hasItemMeta() &&
                 player.getInventory().getItemInMainHand().getItemMeta().hasDisplayName() &&
                 player.getInventory().getItemInMainHand().getItemMeta().getDisplayName().contains("Explosive")) {
-            
+
             // Check if clicked on a defense block
             if (block.getType() == CraftingManager.getDefenseBlockMaterial()) {
-                // Handle explosive placement
-                // This would need to be implemented with a RaidManager
+                // Handle explosive placement with RaidManager
+                RaidManager raidManager = plugin.getRaidManager();
+                if (raidManager != null) {
+                    boolean success = raidManager.placeExplosive(player, block, player.getInventory().getItemInMainHand());
+                    if (success) {
+                        // Explosive placed successfully
+                        event.setCancelled(true);
+                        return;
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "Raiding is not enabled on this server.");
+                }
                 event.setCancelled(true);
                 return;
             }
         }
     }
-    
+
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player victim = event.getEntity();
         Player killer = victim.getKiller();
-        
+
         // Check if killed by another player
         if (killer != null) {
             // Get clans
             Clan victimClan = plugin.getClanManager().getClanByPlayer(victim.getUniqueId());
             Clan killerClan = plugin.getClanManager().getClanByPlayer(killer.getUniqueId());
-            
+
             // Check if both players are in different clans
             if (victimClan != null && killerClan != null && !victimClan.equals(killerClan)) {
                 // Award points to killer's clan
                 int killPoints = plugin.getConfigManager().getConfig().getInt("pvp.kill-points", 50);
                 killerClan.addPoints(killPoints);
-                
+
                 // Deduct points from victim's clan
                 int deathPenalty = plugin.getConfigManager().getConfig().getInt("pvp.death-penalty", 25);
                 victimClan.removePoints(deathPenalty);
-                
+
                 // Notify players
                 killer.sendMessage(ChatColor.GREEN + "Your clan gained " + killPoints + " points for killing " + victim.getName() + "!");
                 victim.sendMessage(ChatColor.RED + "Your clan lost " + deathPenalty + " points for being killed by " + killer.getName() + "!");
             }
         }
     }
-    
+
     /**
      * Handle core block interaction
      * @param player Player interacting
@@ -150,19 +161,19 @@ public class PlayerListeners implements Listener {
      */
     private void handleCoreBlockInteraction(Player player, CoreBlock coreBlock) {
         Clan clan = coreBlock.getClan();
-        
+
         // Check if player is in the clan
         if (!clan.isMember(player.getUniqueId())) {
             player.sendMessage(ChatColor.RED + "This core block belongs to clan " + clan.getName() + ".");
             return;
         }
-        
+
         // Check if player is close enough
         if (player.getLocation().distanceSquared(coreBlock.getLocation()) > 4) {
             player.sendMessage(ChatColor.RED + "You must be within 2 blocks to use the core block.");
             return;
         }
-        
+
         // Open core block GUI
         // This would need to be implemented with a GUI manager
         player.sendMessage(ChatColor.GREEN + "Core Block - Clan: " + clan.getName());
@@ -172,7 +183,7 @@ public class PlayerListeners implements Listener {
         player.sendMessage(ChatColor.YELLOW + "Defense Blocks: " + ChatColor.WHITE + clan.getDefenseBlockCount() + "/" + coreBlock.getMaxDefenseBlocks());
         player.sendMessage(ChatColor.YELLOW + "Claim Blocks: " + ChatColor.WHITE + clan.getClaimBlockCount() + "/" + coreBlock.getMaxClaimBlocks());
         player.sendMessage(ChatColor.YELLOW + "Clan Doors: " + ChatColor.WHITE + clan.getClanDoorCount() + "/" + coreBlock.getMaxClanDoors());
-        
+
         // Show upgrade info if not at max level
         int upgradeCost = coreBlock.getUpgradeCost();
         if (upgradeCost != -1) {
@@ -181,7 +192,7 @@ public class PlayerListeners implements Listener {
         } else {
             player.sendMessage(ChatColor.YELLOW + "Core is at maximum level.");
         }
-        
+
         // Show upkeep info
         if (coreBlock.isUpkeepDue()) {
             player.sendMessage(ChatColor.RED + "Upkeep: " + ChatColor.WHITE + "Due now! Cost: " + coreBlock.getUpkeepCost() + " points");
