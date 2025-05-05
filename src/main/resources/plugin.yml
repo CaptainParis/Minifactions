@@ -1,0 +1,12 @@
+name: MiniFactions
+version: '1.1.0'
+main: Factions.miniFactions.MiniFactions
+api-version: '1.21'
+authors: [ CaptainParis (Paris) ]
+description: Faction Setup For MiniFactions
+
+commands:
+  clan:
+    description: Main command for MiniFactions
+    usage: /clan <subcommand>
+    aliases: [f, faction]
