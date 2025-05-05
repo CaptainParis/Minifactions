@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -120,37 +121,73 @@ public class CoreBlockManager {
         Clan clan = coreBlock.getClan();
         Clan breakerClan = plugin.getClanManager().getClanByPlayer(breaker.getUniqueId());
 
-        // Calculate points to give to breaker's clan
-        int pointsPercentage = plugin.getConfigManager().getConfig().getInt("core.points-on-break-percentage", 50);
-        int pointsToGive = (clan.getPoints() * pointsPercentage) / 100;
+        // Check if breaker is from the same clan
+        boolean isClanMember = breakerClan != null && breakerClan.equals(clan);
 
-        // Check if breaker is from another clan (enemy)
-        boolean isEnemy = breakerClan != null && !breakerClan.equals(clan);
+        // If breaker is not a clan member, handle as enemy raid
+        if (!isClanMember) {
+            // Calculate points to give to breaker's clan
+            int pointsPercentage = plugin.getConfigManager().getConfig().getInt("core.points-on-break-percentage", 50);
+            int pointsToGive = (clan.getPoints() * pointsPercentage) / 100;
 
-        // Give points to breaker's clan if they have one
-        if (breakerClan != null && pointsToGive > 0) {
-            breakerClan.addPoints(pointsToGive);
-            breaker.sendMessage(ChatColor.GREEN + "Your clan gained " + pointsToGive + " points from breaking " +
-                    clan.getName() + "'s core block!");
-        }
+            // Check if breaker is from another clan (enemy)
+            boolean isEnemy = breakerClan != null;
 
-        // Notify clan members
-        for (UUID memberUUID : clan.getMembers().keySet()) {
-            Player member = Bukkit.getPlayer(memberUUID);
-            if (member != null && member.isOnline()) {
-                member.sendMessage(ChatColor.RED + "Your clan's core block has been destroyed by " + breaker.getName() + "!");
+            // Give points to breaker's clan if they have one
+            if (breakerClan != null && pointsToGive > 0) {
+                breakerClan.addPoints(pointsToGive);
+                breaker.sendMessage(ChatColor.GREEN + "Your clan gained " + pointsToGive + " points from breaking " +
+                        clan.getName() + "'s core block!");
             }
+
+            // Notify clan members
+            for (UUID memberUUID : clan.getMembers().keySet()) {
+                Player member = Bukkit.getPlayer(memberUUID);
+                if (member != null && member.isOnline()) {
+                    member.sendMessage(ChatColor.RED + "Your clan's core block has been destroyed by " + breaker.getName() + "!");
+                }
+            }
+
+            // Remove the core block
+            boolean removed = removeCoreBlock(location);
+
+            // If destroyed by an enemy, give the clan leader a new core block
+            if (removed && isEnemy) {
+                plugin.getClanManager().giveCoreBlockToLeader(clan);
+            }
+
+            return removed;
+        } else {
+            // Breaker is a clan member
+            // Check if breaker is leader or co-leader
+            if (!clan.isLeader(breaker.getUniqueId()) && !clan.isCoLeader(breaker.getUniqueId())) {
+                breaker.sendMessage(ChatColor.RED + "Only the clan leader or co-leaders can break the core block.");
+                return false;
+            }
+
+            // Notify clan members
+            for (UUID memberUUID : clan.getMembers().keySet()) {
+                if (memberUUID.equals(breaker.getUniqueId())) continue; // Skip the breaker
+
+                Player member = Bukkit.getPlayer(memberUUID);
+                if (member != null && member.isOnline()) {
+                    member.sendMessage(ChatColor.YELLOW + "Your clan's core block has been removed by " + breaker.getName() + ".");
+                }
+            }
+
+            // Remove the core block
+            boolean removed = removeCoreBlock(location);
+
+            // Give the core block back to the player
+            if (removed) {
+                int coreLevel = coreBlock.getLevel();
+                ItemStack coreBlockItem = plugin.getCraftingManager().createCoreBlock(coreLevel);
+                breaker.getInventory().addItem(coreBlockItem);
+                breaker.sendMessage(ChatColor.GREEN + "You have received your clan's core block.");
+            }
+
+            return removed;
         }
-
-        // Remove the core block
-        boolean removed = removeCoreBlock(location);
-
-        // If destroyed by an enemy, give the clan leader a new core block
-        if (removed && isEnemy) {
-            plugin.getClanManager().giveCoreBlockToLeader(clan);
-        }
-
-        return removed;
     }
 
     /**

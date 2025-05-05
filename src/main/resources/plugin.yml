@@ -10,3 +10,7 @@ commands:
     description: Main command for MiniFactions
     usage: /clan <subcommand>
     aliases: [f, faction]
+  admincore:
+    description: Admin command for managing core blocks
+    usage: /admincore
+    permission: minifactions.admin

@@ -8,6 +8,8 @@ import Factions.miniFactions.models.CoreBlock;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -175,31 +177,68 @@ public class PlayerListeners implements Listener {
         }
 
         // Open core block GUI
-        // This would need to be implemented with a GUI manager
-        player.sendMessage(ChatColor.GREEN + "Core Block - Clan: " + clan.getName());
-        player.sendMessage(ChatColor.YELLOW + "Level: " + ChatColor.WHITE + coreBlock.getLevel());
-        player.sendMessage(ChatColor.YELLOW + "Points: " + ChatColor.WHITE + clan.getPoints());
-        player.sendMessage(ChatColor.YELLOW + "Buildable Area: " + ChatColor.WHITE + coreBlock.getBuildableArea() + " blocks");
-        player.sendMessage(ChatColor.YELLOW + "Defense Blocks: " + ChatColor.WHITE + clan.getDefenseBlockCount() + "/" + coreBlock.getMaxDefenseBlocks());
-        player.sendMessage(ChatColor.YELLOW + "Claim Blocks: " + ChatColor.WHITE + clan.getClaimBlockCount() + "/" + coreBlock.getMaxClaimBlocks());
-        player.sendMessage(ChatColor.YELLOW + "Clan Doors: " + ChatColor.WHITE + clan.getClanDoorCount() + "/" + coreBlock.getMaxClanDoors());
+        plugin.getGUIManager().openCoreBlockGUI(player, coreBlock);
+    }
 
-        // Show upgrade info if not at max level
-        int upgradeCost = coreBlock.getUpgradeCost();
-        if (upgradeCost != -1) {
-            player.sendMessage(ChatColor.YELLOW + "Upgrade Cost: " + ChatColor.WHITE + upgradeCost + " points");
-            player.sendMessage(ChatColor.YELLOW + "Type " + ChatColor.WHITE + "/clan core upgrade" + ChatColor.YELLOW + " to upgrade.");
-        } else {
-            player.sendMessage(ChatColor.YELLOW + "Core is at maximum level.");
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
         }
 
-        // Show upkeep info
-        if (coreBlock.isUpkeepDue()) {
-            player.sendMessage(ChatColor.RED + "Upkeep: " + ChatColor.WHITE + "Due now! Cost: " + coreBlock.getUpkeepCost() + " points");
-            player.sendMessage(ChatColor.YELLOW + "Type " + ChatColor.WHITE + "/clan core pay" + ChatColor.YELLOW + " to pay upkeep.");
-        } else {
-            player.sendMessage(ChatColor.YELLOW + "Upkeep: " + ChatColor.WHITE + coreBlock.getUpkeepCost() + " points");
-            player.sendMessage(ChatColor.YELLOW + "Days of Upkeep: " + ChatColor.WHITE + coreBlock.getDaysOfUpkeep());
+        Player player = (Player) event.getWhoClicked();
+        String title = event.getView().getTitle();
+
+        // Check if this is a core block GUI
+        if (title.startsWith(ChatColor.GOLD + "Core Block -")) {
+            event.setCancelled(true); // Prevent item movement
+
+            // Handle the click
+            if (plugin.getGUIManager().handleCoreBlockGUIClick(player, event.getRawSlot())) {
+                // Click was handled by the GUI manager
+                return;
+            }
+        }
+
+        // Check if this is an admin GUI
+        if (title.startsWith(ChatColor.DARK_RED + "MiniFactions Admin") ||
+            title.startsWith(ChatColor.DARK_RED + "Core Level Management") ||
+            title.startsWith(ChatColor.DARK_RED + "Plugin Blocks") ||
+            title.startsWith(ChatColor.DARK_RED + "Points Management")) {
+
+            event.setCancelled(true); // Prevent item movement
+
+            // Handle the click
+            if (plugin.getAdminCoreCommand().handleAdminGUIClick(player, event.getRawSlot())) {
+                // Click was handled by the admin command
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if (!(event.getPlayer() instanceof Player)) {
+            return;
+        }
+
+        Player player = (Player) event.getPlayer();
+        String title = event.getView().getTitle();
+
+        // Check if this is a core block GUI
+        if (title.startsWith(ChatColor.GOLD + "Core Block -")) {
+            // Remove player from the GUI manager
+            plugin.getGUIManager().removePlayer(player);
+        }
+
+        // Check if this is an admin GUI
+        if (title.startsWith(ChatColor.DARK_RED + "MiniFactions Admin") ||
+            title.startsWith(ChatColor.DARK_RED + "Core Level Management") ||
+            title.startsWith(ChatColor.DARK_RED + "Plugin Blocks") ||
+            title.startsWith(ChatColor.DARK_RED + "Points Management")) {
+
+            // Remove player from the admin command
+            plugin.getAdminCoreCommand().removePlayer(player);
         }
     }
 }

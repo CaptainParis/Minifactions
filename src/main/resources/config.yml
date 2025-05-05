@@ -11,6 +11,13 @@ core:
   max-level: 20
   points-on-break-percentage: 50
   beacon-effect: true
+  # Outside block settings
+  outside-blocks:
+    enabled: true
+    min-decay-time: 30 # minutes
+    max-decay-time: 120 # minutes
+    safe-distance: 5 # blocks from core that won't decay
+    check-interval: 5 # minutes between decay checks
   # Detailed level configuration
   levels:
     # Level 1 (Starting level)

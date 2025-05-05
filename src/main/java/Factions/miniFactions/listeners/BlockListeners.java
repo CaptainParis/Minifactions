@@ -83,8 +83,18 @@ public class BlockListeners implements Listener {
             // Check if within radius
             double distanceSquared = block.getLocation().distanceSquared(coreLoc);
             if (distanceSquared > radius * radius) {
-                player.sendMessage(ChatColor.RED + "You can only build within your clan's area of influence.");
-                event.setCancelled(true);
+                // Allow building outside core area, but track the block for decay
+                if (plugin.getConfigManager().getConfig().getBoolean("core.outside-blocks.enabled", true)) {
+                    // Track the block for decay
+                    plugin.getOutsideBlockManager().trackBlock(block.getLocation(), clan, block.getType());
+
+                    // Notify player
+                    player.sendMessage(ChatColor.YELLOW + "You are building outside your clan's area of influence. This block will decay over time.");
+                } else {
+                    // If outside blocks are disabled, prevent building
+                    player.sendMessage(ChatColor.RED + "You can only build within your clan's area of influence.");
+                    event.setCancelled(true);
+                }
             }
         }
     }
@@ -117,11 +127,32 @@ public class BlockListeners implements Listener {
             // Get the defense block from storage
             DefenseBlock defenseBlock = plugin.getDataStorage().getDefenseBlock(block.getLocation());
             if (defenseBlock != null) {
-                // Defense blocks can only be broken by explosives
-                event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "Defense blocks can only be broken by explosives.");
-                return;
+                // Get the clan that owns the defense block
+                Clan defenseBlockClan = defenseBlock.getClan();
+                // Get the player's clan
+                Clan playerClan = plugin.getClanManager().getClanByPlayer(player.getUniqueId());
+
+                // Check if player is in the same clan as the defense block
+                if (playerClan != null && playerClan.equals(defenseBlockClan)) {
+                    // Allow clan members to break their own defense blocks
+                    // Remove from storage
+                    defenseBlockClan.removeDefenseBlock(defenseBlock);
+                    plugin.getDataStorage().removeDefenseBlock(block.getLocation());
+                    player.sendMessage(ChatColor.GREEN + "Defense block removed.");
+                    return;
+                } else {
+                    // Defense blocks can only be broken by explosives or clan members
+                    event.setCancelled(true);
+                    player.sendMessage(ChatColor.RED + "Defense blocks can only be broken by explosives or clan members.");
+                    return;
+                }
             }
+        }
+
+        // Check if this is a tracked outside block
+        if (plugin.getOutsideBlockManager().isTrackedBlock(block.getLocation())) {
+            // Remove from tracking when broken
+            plugin.getOutsideBlockManager().removeBlock(block.getLocation());
         }
 
         // Check if player is in a clan
@@ -146,8 +177,9 @@ public class BlockListeners implements Listener {
                 // Get the defense block from storage
                 DefenseBlock defenseBlock = plugin.getDataStorage().getDefenseBlock(block.getLocation());
                 if (defenseBlock != null) {
-                    // Defense blocks can only be broken by explosives placed by players
-                    // This is handled by the RaidManager, so cancel the explosion for defense blocks
+                    // Defense blocks can only be broken by explosives placed by players or clan members
+                    // Natural explosions should not break defense blocks
+                    // This is handled by the RaidManager for player-placed explosives
                     event.blockList().remove(block);
                 }
             }
@@ -157,8 +189,9 @@ public class BlockListeners implements Listener {
                 // Get the core block from storage
                 CoreBlock coreBlock = plugin.getDataStorage().getCoreBlock(block.getLocation());
                 if (coreBlock != null) {
-                    // Core blocks can only be broken by explosives placed by players
-                    // This is handled by the RaidManager, so cancel the explosion for core blocks
+                    // Core blocks can only be broken by explosives placed by players or clan members
+                    // Natural explosions should not break core blocks
+                    // This is handled by the RaidManager for player-placed explosives
                     event.blockList().remove(block);
                 }
             }
