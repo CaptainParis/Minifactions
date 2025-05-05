@@ -1,10 +1,14 @@
 package Factions.miniFactions.models;
 
 import Factions.miniFactions.MiniFactions;
+import Factions.miniFactions.spatial.BlockType;
+import Factions.miniFactions.spatial.SpatiallyIndexable;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
-public class CoreBlock {
+import java.util.Objects;
+
+public class CoreBlock implements SpatiallyIndexable {
 
     private final Location location;
     private final Clan clan;
@@ -15,8 +19,16 @@ public class CoreBlock {
      * Create a new core block
      * @param location Block location
      * @param clan Owning clan
+     * @throws IllegalArgumentException if location or clan is null
      */
     public CoreBlock(Location location, Clan clan) {
+        if (location == null) {
+            throw new IllegalArgumentException("Core block location cannot be null");
+        }
+        if (clan == null) {
+            throw new IllegalArgumentException("Core block clan cannot be null");
+        }
+
         this.location = location;
         this.clan = clan;
         this.level = 1;
@@ -25,10 +37,10 @@ public class CoreBlock {
 
     /**
      * Get the block location
-     * @return Location
+     * @return Location (never null)
      */
     public Location getLocation() {
-        return location;
+        return location.clone(); // Return a clone to prevent modification
     }
 
     /**
@@ -50,8 +62,9 @@ public class CoreBlock {
     /**
      * Set the core level
      * @param level New level
+     * @return The actual level that was set (may be clamped to valid range)
      */
-    public void setLevel(int level) {
+    public int setLevel(int level) {
         FileConfiguration config = MiniFactions.getInstance().getConfigManager().getConfig();
         int maxLevel = config.getInt("core.max-level", 20);
 
@@ -62,6 +75,8 @@ public class CoreBlock {
         } else {
             this.level = level;
         }
+
+        return this.level;
     }
 
     /**
@@ -90,8 +105,13 @@ public class CoreBlock {
     /**
      * Set the last upkeep time
      * @param lastUpkeepTime New upkeep time in milliseconds
+     * @throws IllegalArgumentException if lastUpkeepTime is in the future
      */
     public void setLastUpkeepTime(long lastUpkeepTime) {
+        long currentTime = System.currentTimeMillis();
+        if (lastUpkeepTime > currentTime) {
+            throw new IllegalArgumentException("Upkeep time cannot be in the future");
+        }
         this.lastUpkeepTime = lastUpkeepTime;
     }
 
@@ -227,5 +247,37 @@ public class CoreBlock {
         }
 
         return clan.getPoints() / upkeepCost;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CoreBlock coreBlock = (CoreBlock) o;
+        return Objects.equals(location, coreBlock.location);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(location);
+    }
+
+    @Override
+    public String toString() {
+        return "CoreBlock{" +
+                "location=" + location +
+                ", clan=" + clan.getName() +
+                ", level=" + level +
+                ", lastUpkeepTime=" + lastUpkeepTime +
+                '}';
+    }
+
+    /**
+     * Get the block type for spatial indexing
+     * @return BlockType.CORE
+     */
+    @Override
+    public BlockType getBlockType() {
+        return BlockType.CORE;
     }
 }

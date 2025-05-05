@@ -22,12 +22,14 @@ public class CoreBlockManager {
 
     private final MiniFactions plugin;
     private final Map<UUID, BukkitTask> beaconEffectTasks = new HashMap<>();
+    private final CoreBlockVisualManager visualManager;
 
     // Material for core blocks
     private static final Material CORE_BLOCK_MATERIAL = Material.BEACON;
 
     public CoreBlockManager(MiniFactions plugin) {
         this.plugin = plugin;
+        this.visualManager = new CoreBlockVisualManager(plugin);
         startBeaconEffectTask();
         startUpkeepTask();
     }
@@ -74,6 +76,9 @@ public class CoreBlockManager {
             startBeaconEffect(clan);
         }
 
+        // Create text display and particles
+        visualManager.createOrUpdateTextDisplay(coreBlock);
+
         player.sendMessage(ChatColor.GREEN + "Core block created successfully!");
         return coreBlock;
     }
@@ -99,6 +104,9 @@ public class CoreBlockManager {
 
         // Stop beacon effect
         stopBeaconEffect(clan);
+
+        // Remove text display
+        visualManager.removeTextDisplay(location);
 
         // Set block to air
         location.getBlock().setType(Material.AIR);
@@ -227,6 +235,9 @@ public class CoreBlockManager {
         // Upgrade the core block
         clan.removePoints(upgradeCost);
         coreBlock.upgrade();
+
+        // Update text display with new level
+        visualManager.createOrUpdateTextDisplay(coreBlock);
 
         // Notify clan members
         for (UUID memberUUID : clan.getMembers().keySet()) {
@@ -370,15 +381,29 @@ public class CoreBlockManager {
     private void startUpkeepTask() {
         // Run every hour
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            plugin.getLogger().info("Running upkeep task for all clans...");
             for (Clan clan : plugin.getDataStorage().getClans().values()) {
-                if (clan.getCoreBlock() != null && clan.getCoreBlock().isUpkeepDue()) {
-                    if (!clan.getCoreBlock().payUpkeep()) {
-                        // Notify clan members
-                        for (UUID memberUUID : clan.getMembers().keySet()) {
-                            Player member = Bukkit.getPlayer(memberUUID);
-                            if (member != null && member.isOnline()) {
-                                member.sendMessage(ChatColor.RED + "Your clan could not pay the upkeep cost! " +
-                                        "Defense blocks will start to decay.");
+                if (clan.getCoreBlock() != null) {
+                    if (clan.getCoreBlock().isUpkeepDue()) {
+                        plugin.getLogger().info("Upkeep is due for clan: " + clan.getName());
+                        if (!clan.getCoreBlock().payUpkeep()) {
+                            // Notify clan members
+                            for (UUID memberUUID : clan.getMembers().keySet()) {
+                                Player member = Bukkit.getPlayer(memberUUID);
+                                if (member != null && member.isOnline()) {
+                                    member.sendMessage(ChatColor.RED + "Your clan could not pay the upkeep cost! " +
+                                            "Defense blocks will start to decay.");
+                                }
+                            }
+                        } else {
+                            plugin.getLogger().info("Clan " + clan.getName() + " paid upkeep successfully.");
+                            // Notify clan members
+                            for (UUID memberUUID : clan.getMembers().keySet()) {
+                                Player member = Bukkit.getPlayer(memberUUID);
+                                if (member != null && member.isOnline()) {
+                                    member.sendMessage(ChatColor.GREEN + "Your clan paid the upkeep cost of " +
+                                            clan.getCoreBlock().getUpkeepCost() + " points.");
+                                }
                             }
                         }
                     }
@@ -396,6 +421,9 @@ public class CoreBlockManager {
             task.cancel();
         }
         beaconEffectTasks.clear();
+
+        // Cleanup visual manager
+        visualManager.cleanup();
     }
 
     /**
@@ -404,5 +432,13 @@ public class CoreBlockManager {
      */
     public static Material getCoreBlockMaterial() {
         return CORE_BLOCK_MATERIAL;
+    }
+
+    /**
+     * Get the visual manager
+     * @return CoreBlockVisualManager
+     */
+    public CoreBlockVisualManager getVisualManager() {
+        return visualManager;
     }
 }

@@ -5,6 +5,13 @@
 # Claim Blocks: E = Emerald, R = Redstone Block, D = Diamond
 # Defense Blocks: O = Obsidian, I = Iron Ingot/Block, C = Crying Obsidian, G = Gold Block, D = Diamond Block
 # Explosives: G = Gunpowder, B = Button, R = Redstone/Redstone Block, P = Blaze Powder
+#
+# Defense Block Tiers:
+# Tier 1: White Terracotta
+# Tier 2: Light Gray Terracotta
+# Tier 3: Brown Terracotta
+# Tier 4: Gray Terracotta
+# Tier 5: Black Terracotta
 
 # Core Block Settings
 core:
@@ -23,239 +30,239 @@ core:
     # Level 1 (Starting level)
     1:
       area: 10
-      defense-slots: 5
+      defense-slots: 20
       claim-slots: 2
       door-slots: 1
-      member-slots: 10
-      upkeep-cost: 100
-      upgrade-cost: 1000
+      member-slots: 5
+      upkeep-cost: 30
+      upgrade-cost: 200
       # Core blocks are no longer craftable
       # They are given to clan leaders automatically
     # Level 2
     2:
       area: 15
-      defense-slots: 8
-      claim-slots: 3
+      defense-slots: 25
+      claim-slots: 5
       door-slots: 2
-      member-slots: 12
+      member-slots: 5
       upkeep-cost: 150
-      upgrade-cost: 2000
+      upgrade-cost: 300
       # Core blocks are no longer craftable
       # They are given to clan leaders automatically
     # Level 3
     3:
-      area: 20
-      defense-slots: 11
+      area: 25
+      defense-slots: 30
       claim-slots: 4
       door-slots: 3
-      member-slots: 14
+      member-slots: 5
       upkeep-cost: 200
-      upgrade-cost: 4000
+      upgrade-cost: 400
       # Core blocks are no longer craftable
       # They are given to clan leaders automatically
     # Level 4
     4:
       area: 25
-      defense-slots: 14
+      defense-slots: 35
       claim-slots: 5
       door-slots: 4
-      member-slots: 16
+      member-slots: 5
       upkeep-cost: 250
-      upgrade-cost: 8000
+      upgrade-cost: 600
       recipe:
         - "DIAMOND:8"
         - "GOLD_BLOCK:4"
         - "OBSIDIAN:64"
     # Level 5
     5:
-      area: 30
-      defense-slots: 17
+      area: 25
+      defense-slots: 40
       claim-slots: 6
       door-slots: 5
-      member-slots: 18
+      member-slots: 5
       upkeep-cost: 300
-      upgrade-cost: 16000
+      upgrade-cost: 800
       recipe:
         - "DIAMOND:16"
         - "GOLD_BLOCK:8"
         - "OBSIDIAN:128"
     # Level 6-10 (Moderate progression)
     6:
-      area: 35
-      defense-slots: 20
+      area: 25
+      defense-slots: 45
       claim-slots: 7
-      door-slots: 6
-      member-slots: 20
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 350
-      upgrade-cost: 32000
+      upgrade-cost: 900
       recipe:
         - "DIAMOND:32"
         - "GOLD_BLOCK:16"
         - "OBSIDIAN:256"
     7:
-      area: 40
-      defense-slots: 23
+      area: 25
+      defense-slots: 50
       claim-slots: 8
-      door-slots: 7
-      member-slots: 22
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 400
-      upgrade-cost: 64000
+      upgrade-cost: 1000
       recipe:
         - "DIAMOND_BLOCK:1"
         - "GOLD_BLOCK:32"
         - "OBSIDIAN:512"
     8:
-      area: 45
-      defense-slots: 26
+      area: 25
+      defense-slots: 55
       claim-slots: 9
-      door-slots: 8
-      member-slots: 24
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 450
-      upgrade-cost: 128000
+      upgrade-cost: 1500
       recipe:
         - "DIAMOND_BLOCK:2"
         - "GOLD_BLOCK:64"
         - "NETHERITE_SCRAP:1"
     9:
-      area: 50
-      defense-slots: 29
+      area: 25
+      defense-slots: 60
       claim-slots: 10
-      door-slots: 9
-      member-slots: 26
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 500
-      upgrade-cost: 256000
+      upgrade-cost: 2000
       recipe:
         - "DIAMOND_BLOCK:4"
         - "EMERALD_BLOCK:2"
         - "NETHERITE_SCRAP:2"
     10:
-      area: 60
-      defense-slots: 35
+      area: 25
+      defense-slots: 65
       claim-slots: 12
-      door-slots: 10
-      member-slots: 30
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 600
-      upgrade-cost: 512000
+      upgrade-cost: 2500
       recipe:
         - "DIAMOND_BLOCK:8"
         - "EMERALD_BLOCK:4"
         - "NETHERITE_SCRAP:4"
     # Level 11-20 (Advanced progression - significant jumps every 5 levels)
     11:
-      area: 65
-      defense-slots: 38
+      area: 25
+      defense-slots: 70
       claim-slots: 13
-      door-slots: 11
-      member-slots: 32
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 700
-      upgrade-cost: 1024000
+      upgrade-cost: 3000
       recipe:
         - "DIAMOND_BLOCK:16"
         - "EMERALD_BLOCK:8"
         - "NETHERITE_SCRAP:8"
     12:
-      area: 70
-      defense-slots: 41
+      area: 25
+      defense-slots: 75
       claim-slots: 14
-      door-slots: 12
-      member-slots: 34
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 800
-      upgrade-cost: 2048000
+      upgrade-cost: 4000
       recipe:
         - "DIAMOND_BLOCK:32"
         - "EMERALD_BLOCK:16"
         - "NETHERITE_INGOT:1"
     13:
-      area: 75
-      defense-slots: 44
+      area: 25
+      defense-slots: 80
       claim-slots: 15
-      door-slots: 13
-      member-slots: 36
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 900
-      upgrade-cost: 4096000
+      upgrade-cost: 5000
       recipe:
         - "DIAMOND_BLOCK:64"
         - "EMERALD_BLOCK:32"
         - "NETHERITE_INGOT:2"
     14:
-      area: 80
-      defense-slots: 47
+      area: 25
+      defense-slots: 85
       claim-slots: 16
-      door-slots: 14
-      member-slots: 38
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 1000
-      upgrade-cost: 8192000
+      upgrade-cost: 6000
       recipe:
         - "DIAMOND_BLOCK:128"
         - "EMERALD_BLOCK:64"
         - "NETHERITE_INGOT:4"
     15:
-      area: 90
-      defense-slots: 55
+      area: 25
+      defense-slots: 90
       claim-slots: 18
-      door-slots: 15
-      member-slots: 40
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 1200
-      upgrade-cost: 16384000
+      upgrade-cost: 8000
       recipe:
         - "DIAMOND_BLOCK:256"
         - "EMERALD_BLOCK:128"
         - "NETHERITE_BLOCK:1"
     16:
-      area: 95
-      defense-slots: 58
+      area: 25
+      defense-slots: 95
       claim-slots: 19
-      door-slots: 16
-      member-slots: 42
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 1400
-      upgrade-cost: 32768000
+      upgrade-cost: 9000
       recipe:
         - "DIAMOND_BLOCK:512"
         - "EMERALD_BLOCK:256"
         - "NETHERITE_BLOCK:2"
     17:
-      area: 100
-      defense-slots: 61
+      area: 25
+      defense-slots: 100
       claim-slots: 20
-      door-slots: 17
-      member-slots: 44
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 1600
-      upgrade-cost: 65536000
+      upgrade-cost: 10000
       recipe:
         - "DIAMOND_BLOCK:1024"
         - "EMERALD_BLOCK:512"
         - "NETHERITE_BLOCK:4"
     18:
-      area: 105
-      defense-slots: 64
+      area: 25
+      defense-slots: 115
       claim-slots: 21
-      door-slots: 18
-      member-slots: 46
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 1800
-      upgrade-cost: 131072000
+      upgrade-cost: 11000
       recipe:
         - "DIAMOND_BLOCK:2048"
         - "EMERALD_BLOCK:1024"
         - "NETHERITE_BLOCK:8"
     19:
-      area: 110
-      defense-slots: 67
+      area: 25
+      defense-slots: 150
       claim-slots: 22
-      door-slots: 19
-      member-slots: 48
+      door-slots: 5
+      member-slots: 5
       upkeep-cost: 2000
-      upgrade-cost: 262144000
+      upgrade-cost: 15000
       recipe:
         - "DIAMOND_BLOCK:4096"
         - "EMERALD_BLOCK:2048"
         - "NETHERITE_BLOCK:16"
     20:
-      area: 125
-      defense-slots: 75
+      area: 25
+      defense-slots: 200
       claim-slots: 25
-      door-slots: 20
-      member-slots: 50
-      upkeep-cost: 2500
+      door-slots: 10
+      member-slots: 5
+      upkeep-cost: 20000
       # No upgrade cost for max level
       recipe:
         - "DIAMOND_BLOCK:8192"
@@ -265,14 +272,44 @@ core:
     enabled: true
     payment-interval: 24 # hours
 
+# Global Upkeep Settings
+upkeep:
+  enabled: true
+  check-interval: 1 # hours between upkeep checks
+  warning-time: 6 # hours before upkeep is due to send warnings
+  # Core Block Upkeep
+  core:
+    enabled: true
+    penalty-type: "LEVEL_REDUCTION" # LEVEL_REDUCTION, POINT_PENALTY, NONE
+    point-penalty-percentage: 10 # % of points to deduct if penalty-type is POINT_PENALTY
+    level-reduction: 1 # levels to reduce if penalty-type is LEVEL_REDUCTION
+    grace-period: 10 # hours before applying penalties
+  # Claim Block Upkeep
+  claim:
+    enabled: true
+    penalty-type: "LEVEL_REDUCTION" # LEVEL_REDUCTION, POINT_GENERATION_STOP, DESTRUCTION
+    level-reduction: 1 # levels to reduce if penalty-type is LEVEL_REDUCTION
+    grace-period: 24 # hours before applying penalties
+  # Defense Block Upkeep
+  defense:
+    enabled: true
+    penalty-type: "TIER_REDUCTION" # TIER_REDUCTION, DESTRUCTION
+    tier-reduction: 1 # tiers to reduce if penalty-type is TIER_REDUCTION
+    grace-period: 10 # hours before applying penalties
+  # Clan Door Upkeep
+  door:
+    enabled: true
+    penalty-type: "DESTRUCTION" # PUBLIC_ACCESS, DESTRUCTION
+    grace-period: 2 # hours before applying penalties
+
 # Claim Block Settings
 claim:
   max-upgrade-level: 5
   levels:
     # Level 1 (Base)
     1:
-      points-per-day: 100
-      upgrade-cost: 500
+      points-per-day: 10
+      upgrade-cost: 100
       recipe-pattern:
         - "EEE"
         - "ERE"
@@ -282,42 +319,42 @@ claim:
         R: REDSTONE_BLOCK
     # Level 2
     2:
-      points-per-day: 250
-      upgrade-cost: 1000
-      recipe:
+      points-per-day: 50
+      upgrade-cost: 200
+      upgrade-items:
         - "EMERALD:16"
         - "REDSTONE_BLOCK:4"
     # Level 3
     3:
-      points-per-day: 500
-      upgrade-cost: 2000
-      recipe:
+      points-per-day: 100
+      upgrade-cost: 250
+      upgrade-items:
         - "EMERALD:32"
         - "REDSTONE_BLOCK:8"
     # Level 4
     4:
-      points-per-day: 1000
-      upgrade-cost: 4000
-      recipe:
+      points-per-day: 150
+      upgrade-cost: 300
+      upgrade-items:
         - "EMERALD_BLOCK:1"
         - "REDSTONE_BLOCK:16"
     # Level 5 (Max)
     5:
-      points-per-day: 2000
-      recipe:
+      points-per-day: 200
+      upgrade-items:
         - "EMERALD_BLOCK:2"
         - "REDSTONE_BLOCK:32"
 
 # Defense Block Settings
 defense:
-  max-tier: 10
-  min-decay-time: 24 # hours
-  max-decay-time: 72 # hours
+  max-tier: 5
+  min-decay-time: 1 # hours
+  max-decay-time: 24 # hours
   tiers:
     # Tier 1 (Basic)
     1:
       cost: 100
-      decay-time: 24 # hours
+      decay-time: 1 # hours
       recipe-pattern:
         - "OOO"
         - "OIO"
@@ -328,76 +365,39 @@ defense:
     # Tier 2
     2:
       cost: 200
-      decay-time: 28 # hours
+      decay-time: 5 # hours
       recipe:
         - "OBSIDIAN:16"
         - "IRON_BLOCK:1"
     # Tier 3
     3:
       cost: 400
-      decay-time: 32 # hours
+      decay-time: 7 # hours
       recipe:
         - "OBSIDIAN:32"
         - "IRON_BLOCK:2"
     # Tier 4
     4:
       cost: 800
-      decay-time: 36 # hours
+      decay-time: 9 # hours
       recipe:
         - "OBSIDIAN:64"
         - "IRON_BLOCK:4"
     # Tier 5
     5:
       cost: 1600
-      decay-time: 40 # hours
+      decay-time: 10 # hours
       recipe:
         - "OBSIDIAN:128"
         - "GOLD_BLOCK:1"
-    # Tier 6
-    6:
-      cost: 3200
-      decay-time: 48 # hours
-      recipe:
-        - "CRYING_OBSIDIAN:16"
-        - "GOLD_BLOCK:2"
-    # Tier 7
-    7:
-      cost: 6400
-      decay-time: 56 # hours
-      recipe:
-        - "CRYING_OBSIDIAN:32"
-        - "GOLD_BLOCK:4"
-    # Tier 8
-    8:
-      cost: 12800
-      decay-time: 64 # hours
-      recipe:
-        - "CRYING_OBSIDIAN:64"
-        - "DIAMOND_BLOCK:1"
-    # Tier 9
-    9:
-      cost: 25600
-      decay-time: 68 # hours
-      recipe:
-        - "CRYING_OBSIDIAN:128"
-        - "DIAMOND_BLOCK:2"
-        - "NETHERITE_SCRAP:1"
-    # Tier 10 (Maximum)
-    10:
-      cost: 51200
-      decay-time: 72 # hours
-      recipe:
-        - "CRYING_OBSIDIAN:256"
-        - "DIAMOND_BLOCK:4"
-        - "NETHERITE_INGOT:1"
 
 # Raiding Settings
 raiding:
-  explosive-fuse-time: 5 # seconds
+  explosive-fuse-time: 6 # seconds
   explosives:
     # Tier 1 (Basic)
     1:
-      fuse-time: 5 # seconds
+      fuse-time: 25 # seconds
       recipe-pattern:
         - "GBG"
         - "BRB"
@@ -408,87 +408,50 @@ raiding:
         R: REDSTONE_BLOCK
     # Tier 2
     2:
-      fuse-time: 5 # seconds
+      fuse-time: 20 # seconds
       recipe:
         - "STONE_BUTTON:4"
         - "GUNPOWDER:8"
         - "REDSTONE:16"
     # Tier 3
     3:
-      fuse-time: 5 # seconds
+      fuse-time: 15 # seconds
       recipe:
         - "STONE_BUTTON:8"
         - "GUNPOWDER:16"
         - "REDSTONE:32"
     # Tier 4
     4:
-      fuse-time: 4 # seconds
+      fuse-time: 10 # seconds
       recipe:
         - "STONE_BUTTON:12"
         - "GUNPOWDER:24"
         - "REDSTONE:64"
     # Tier 5
     5:
-      fuse-time: 4 # seconds
+      fuse-time: 15 # seconds
       recipe:
         - "STONE_BUTTON:16"
         - "GUNPOWDER:32"
         - "REDSTONE_BLOCK:1"
-    # Tier 6
-    6:
-      fuse-time: 4 # seconds
-      recipe:
-        - "STONE_BUTTON:32"
-        - "GUNPOWDER:64"
-        - "REDSTONE_BLOCK:2"
-    # Tier 7
-    7:
-      fuse-time: 3 # seconds
-      recipe:
-        - "STONE_BUTTON:64"
-        - "GUNPOWDER:128"
-        - "REDSTONE_BLOCK:4"
-    # Tier 8
-    8:
-      fuse-time: 3 # seconds
-      recipe:
-        - "STONE_BUTTON:128"
-        - "GUNPOWDER:256"
-        - "REDSTONE_BLOCK:8"
-    # Tier 9
-    9:
-      fuse-time: 2 # seconds
-      recipe:
-        - "STONE_BUTTON:256"
-        - "GUNPOWDER:512"
-        - "REDSTONE_BLOCK:16"
-    # Tier 10 (Maximum)
-    10:
-      fuse-time: 2 # seconds
-      recipe:
-        - "STONE_BUTTON:512"
-        - "GUNPOWDER:1024"
-        - "REDSTONE_BLOCK:32"
-        - "BLAZE_POWDER:16"
-
 # Clan Settings
 clan:
-  max-members: 10
-  max-members-per-level: 2
-  name-min-length: 3
+  max-members: 5
+  max-members-per-level: 0
+  name-min-length: 4
   name-max-length: 16
 
 # KOTH Settings
 koth:
   enabled: true
-  capture-time: 300 # seconds
+  capture-time: 200  # seconds
   reward-points: 1000
   announce-interval: 60 # seconds
 
 # PvP Settings
 pvp:
-  kill-points: 50
-  death-penalty: 25
+  kill-points: 5
+  death-penalty: 5
 
 # Database Settings
 database:

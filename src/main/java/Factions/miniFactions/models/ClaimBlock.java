@@ -1,10 +1,14 @@
 package Factions.miniFactions.models;
 
 import Factions.miniFactions.MiniFactions;
+import Factions.miniFactions.spatial.BlockType;
+import Factions.miniFactions.spatial.SpatiallyIndexable;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
-public class ClaimBlock {
+import java.util.Objects;
+
+public class ClaimBlock implements SpatiallyIndexable {
 
     private final Location location;
     private final Clan clan;
@@ -15,8 +19,16 @@ public class ClaimBlock {
      * Create a new claim block
      * @param location Block location
      * @param clan Owning clan
+     * @throws IllegalArgumentException if location or clan is null
      */
     public ClaimBlock(Location location, Clan clan) {
+        if (location == null) {
+            throw new IllegalArgumentException("Claim block location cannot be null");
+        }
+        if (clan == null) {
+            throw new IllegalArgumentException("Claim block clan cannot be null");
+        }
+
         this.location = location;
         this.clan = clan;
         this.level = 1;
@@ -25,10 +37,10 @@ public class ClaimBlock {
 
     /**
      * Get the block location
-     * @return Location
+     * @return Location (never null)
      */
     public Location getLocation() {
-        return location;
+        return location.clone(); // Return a clone to prevent modification
     }
 
     /**
@@ -50,8 +62,9 @@ public class ClaimBlock {
     /**
      * Set the claim level
      * @param level New level
+     * @return The actual level that was set (may be clamped to valid range)
      */
-    public void setLevel(int level) {
+    public int setLevel(int level) {
         FileConfiguration config = MiniFactions.getInstance().getConfigManager().getConfig();
         int maxLevel = config.getInt("claim.max-upgrade-level", 5);
 
@@ -62,6 +75,8 @@ public class ClaimBlock {
         } else {
             this.level = level;
         }
+
+        return this.level;
     }
 
     /**
@@ -90,8 +105,13 @@ public class ClaimBlock {
     /**
      * Set the last point generation time
      * @param lastPointGenerationTime New generation time in milliseconds
+     * @throws IllegalArgumentException if lastPointGenerationTime is in the future
      */
     public void setLastPointGenerationTime(long lastPointGenerationTime) {
+        long currentTime = System.currentTimeMillis();
+        if (lastPointGenerationTime > currentTime) {
+            throw new IllegalArgumentException("Generation time cannot be in the future");
+        }
         this.lastPointGenerationTime = lastPointGenerationTime;
     }
 
@@ -127,12 +147,12 @@ public class ClaimBlock {
     }
 
     /**
-     * Get the recipe for the current level
+     * Get the required items for upgrading to the next level
      * @return List of material:amount strings
      */
-    public java.util.List<String> getLevelRecipe() {
+    public java.util.List<String> getUpgradeItems() {
         FileConfiguration config = MiniFactions.getInstance().getConfigManager().getConfig();
-        return config.getStringList("claim.levels." + level + ".recipe");
+        return config.getStringList("claim.levels." + (level + 1) + ".upgrade-items");
     }
 
     /**
@@ -148,6 +168,16 @@ public class ClaimBlock {
         // Check if within max claim blocks
         if (clan.getClaimBlockCount() > clan.getCoreBlock().getMaxClaimBlocks()) {
             return false;
+        }
+
+        // Check if upkeep is due and not paid
+        if (clan.getCoreBlock().isUpkeepDue() && !clan.getCoreBlock().payUpkeep()) {
+            // Check if upkeep penalty is set to stop point generation
+            FileConfiguration config = MiniFactions.getInstance().getConfigManager().getConfig();
+            String penaltyType = config.getString("upkeep.claim.penalty-type", "LEVEL_REDUCTION");
+            if (penaltyType.equals("POINT_GENERATION_STOP")) {
+                return false;
+            }
         }
 
         // Check if 24 hours have passed since last generation
@@ -169,5 +199,60 @@ public class ClaimBlock {
         updatePointGenerationTime();
 
         return points;
+    }
+
+    /**
+     * Check if the block is within the clan's core block area of influence
+     * @return true if within AOI
+     */
+    public boolean isWithinCoreBlockAOI() {
+        CoreBlock coreBlock = clan.getCoreBlock();
+        if (coreBlock == null) {
+            return false;
+        }
+
+        Location coreLoc = coreBlock.getLocation();
+        int radius = coreBlock.getBuildableArea();
+
+        // Check if in same world
+        if (!location.getWorld().equals(coreLoc.getWorld())) {
+            return false;
+        }
+
+        // Check if within radius
+        double distanceSquared = location.distanceSquared(coreLoc);
+        return distanceSquared <= radius * radius;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClaimBlock that = (ClaimBlock) o;
+        return Objects.equals(location, that.location);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(location);
+    }
+
+    @Override
+    public String toString() {
+        return "ClaimBlock{" +
+                "location=" + location +
+                ", clan=" + clan.getName() +
+                ", level=" + level +
+                ", lastPointGenerationTime=" + lastPointGenerationTime +
+                '}';
+    }
+
+    /**
+     * Get the block type for spatial indexing
+     * @return BlockType.CLAIM
+     */
+    @Override
+    public BlockType getBlockType() {
+        return BlockType.CLAIM;
     }
 }

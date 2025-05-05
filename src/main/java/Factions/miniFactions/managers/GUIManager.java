@@ -6,6 +6,7 @@ import Factions.miniFactions.models.CoreBlock;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -63,6 +64,36 @@ public class GUIManager {
                 ChatColor.YELLOW + "Claim Slots: " + ChatColor.WHITE + clan.getClaimBlockCount() + "/" + coreBlock.getMaxClaimBlocks(),
                 ChatColor.YELLOW + "Door Slots: " + ChatColor.WHITE + clan.getClanDoorCount() + "/" + coreBlock.getMaxClanDoors());
         gui.setItem(11, coreInfo);
+
+        // Add upkeep information in center
+        boolean isExempt = plugin.getUpkeepManager().isExempt(clan.getLeader());
+        List<String> upkeepLore = new ArrayList<>();
+        upkeepLore.add(ChatColor.YELLOW + "Cost: " + ChatColor.WHITE + coreBlock.getUpkeepCost() + " points");
+
+        if (isExempt) {
+            upkeepLore.add(ChatColor.GREEN + "Your clan is exempt from upkeep");
+        } else if (coreBlock.isUpkeepDue()) {
+            upkeepLore.add(ChatColor.RED + "Upkeep is due now!");
+            upkeepLore.add(ChatColor.RED + "Pay immediately to avoid penalties");
+        } else {
+            // Calculate time until next upkeep
+            FileConfiguration config = plugin.getConfigManager().getConfig();
+            int paymentInterval = config.getInt("core.upkeep.payment-interval", 24);
+            long intervalMillis = paymentInterval * 60 * 60 * 1000L; // Convert hours to milliseconds
+            long timeUntilUpkeep = (coreBlock.getLastUpkeepTime() + intervalMillis) - System.currentTimeMillis();
+
+            if (timeUntilUpkeep > 0) {
+                long hoursRemaining = timeUntilUpkeep / (60 * 60 * 1000L);
+                upkeepLore.add(ChatColor.YELLOW + "Next payment due in: " + ChatColor.WHITE + hoursRemaining + " hours");
+            } else {
+                upkeepLore.add(ChatColor.RED + "Upkeep is overdue!");
+            }
+        }
+
+        upkeepLore.add(ChatColor.YELLOW + "Days of upkeep: " + ChatColor.WHITE + coreBlock.getDaysOfUpkeep());
+
+        ItemStack upkeepInfo = createItem(Material.CLOCK, ChatColor.GOLD + "Upkeep Information", upkeepLore.toArray(new String[0]));
+        gui.setItem(13, upkeepInfo);
 
         // Add upgrade option in center right
         int upgradeCost = coreBlock.getUpgradeCost();
